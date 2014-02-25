@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           AutoReviewComments
 // @namespace      benjol
-// @version        1.3.1
+// @version        1.3.1izzy2
 // @description    Add pro-forma comments dialog for reviewing (pre-flag)
 // @grant          none
 // @include        http*://*stackoverflow.com/questions*
@@ -52,8 +52,8 @@ function with_jquery(f) {
 with_jquery(function ($) {
   StackExchange.ready(function () {
     //**selfupdatingscript starts here (see https://gist.github.com/raw/874058/selfupdatingscript.user.js)
-    var VERSION = '1.3.1';  //<<<<<<<<<<<<*********************** DON'T FORGET TO UPDATE THIS!!!! *************************
-    var URL = "https://github.com/Benjol/SE-AutoReviewComments/raw/master/autoreviewcomments.user.js";
+    var VERSION = '1.3.1izzy2';  //<<<<<<<<<<<<*********************** DON'T FORGET TO UPDATE THIS!!!! *************************
+    var URL = "https://github.com/IzzySoft/SE-AutoReviewComments/per_site_comments/master/autoreviewcomments.user.js";
 
     if(window["selfUpdaterCallback:" + URL]) {
       window["selfUpdaterCallback:" + URL](VERSION);
@@ -73,12 +73,12 @@ with_jquery(function ($) {
     var arr = document.title.split(' - ');
     var sitename = arr[arr.length - 1];
     var username = 'user';
+    var myuserid = getLoggedInUserId();
     var OP = 'OP';
     var prefix = "AutoReviewComments-"; //prefix to avoid clashes in localstorage
 
-    if(sitename == "Stack Exchange") sitename = arr[arr.length - 2]; //workaround for SE sites..
-    if(!GetStorage("WelcomeMessage")) SetStorage("WelcomeMessage", 'Welcome to ' + sitename + '! ');
-    var greeting = GetStorage("WelcomeMessage") == "NONE" ? "" : GetStorage("WelcomeMessage");
+    sitename.replace(/ Stack Exchange/,'');
+    var greeting = 'Welcome to  ' + sitename.replace(/ Stack Exchange/,'') + '! ';
     var showGreeting = false;
 
     var markupTemplate = '                                                                            \
@@ -169,19 +169,31 @@ with_jquery(function ($) {
 
     //default comments
     var defaultcomments = [
-     { Name: "Answers just to say Thanks!", Description: 'Please don\'t add "thanks" as answers. Invest some time in the site and you will gain sufficient <a href="http://$SITEURL$/privileges">privileges</a> to upvote answers you like, which is the $SITENAME$ way of saying thank you.' },
-     { Name: "Nothing but a URL (and isn't spam)", Description: 'Whilst this may theoretically answer the question, <a href="http://meta.stackoverflow.com/q/8259">it would be preferable</a> to include the essential parts of the answer here, and provide the link for reference.' },
-     { Name: "Requests to OP for further information", Description: 'This is really a comment, not an answer. With a bit more rep, <a href="http://$SITEURL$/privileges/comment">you will be able to post comments</a>. For the moment I\'ve added the comment for you, and I\'m flagging this post for deletion.' },
-     { Name: "OP using an answer for further information", Description: 'Please use the <em>Post answer</em> button only for actual answers. You should modify your original question to add additional information.' },
-     { Name: "OP adding a new question as an answer", Description: 'If you have another question, please ask it by clicking the <a href="http://$SITEURL$/questions/ask">Ask Question</a> button.' },
-     { Name: "Another user adding a 'Me too!'", Description: 'If you have a NEW question, please ask it by clicking the <a href="http://$SITEURL$/questions/ask">Ask Question</a> button. If you have sufficient reputation, <a href="http://$SITEURL$/privileges/vote-up">you may upvote</a> the question. Alternatively, "star" it as a favorite and you will be notified of any new answers.' },
+     { Name: "[Q]App recommendation", Description: "Please note that recommendations like *Is there an app for X* are off-topic here (see [What topics can I ask about here?](http://$SITEURL$/help/on-topic) for details). For where your question might fit better, you might want to look into [Where can I ask questions that aren't Android Enthusiast questions?](http://meta.android.stackexchange.com/q/371/$MYUSERID$)", Site: "android.stackexchange.com" },
+     { Name: "[Q]Low question quality", Description: "We will need much more information to give good recommendations here. Please take a look at [What is required for a question to contain \"enough information\"?](http://meta.softwarerecs.stackexchange.com/q/336/$MYUSERID$) Then please [edit] your question and see if you can incorporate some of these improvements.", Site: "softwarerecs.stackexchange.com" },
+     { Name: "[Q]Development question", Description: "This site is for *users* of Android, which means that questions about development/programming are off-topic here (see the [What topics can I ask about here?](http://android.stackexchange.com/help/on-topic)). Development questions are on-topic on our sister site [Stack Overflow](http://stackoverflow.com/questions/tagged/android). You might also wish to consult [Where can I ask questions that aren\'t Android Enthusiast questions?](http://meta.android.stackexchange.com/q/371/$MYUSERID$) for a fitting place to your question.", Site: "android.stackexchange.com" },
+     { Name: "[Q]XY-problem", Description: "This seems to be an [XY problem](http://meta.stackoverflow.com/q/66377/192154). Instead of trying to get your supposed solution working: Mind telling us about the issue behind it?" },
+     { Name: "[Q]More than one question asked", Description: "The question-and-answer format of this site works best if you put each question in a separate question post. Please [edit] your post down to one question, and create new posts to ask any further questions. You\'ll get better answers that way."},  
+     { Name: "[Q]OP providing facts in a comment", Description: "The best way to add additional information to your question is by editing it, with the [edit] link. It is better visible that way, and comments are mainly for secondary, temporary purposes. Comments are removed under a variety of circumstances. Anything important to your question should be in the question itself."},  
+     { Name: "[Q]Frequent Question (use Search)", Description: "This happens to be a question frequently asked on our site. Have you tried our on-site search? See [How do I search?](http://$SITEURL$/help/searching) for help using it."},
+     { Name: "[A]OP adding a new question as an answer", Description: "Remember this is a Q&A site, so keep on [edit]ing your question with new information – this section is for actual answers. If you have another question, please ask it by clicking the [Ask Question](http://$SITEURL$/questions/ask) button."},
+     { Name: "[A]OP using an answer for further information", Description: "This is a question-and-answer site, not a forum. Please use the *Post answer* button only if you have a solution to the problem, so that other users can see your question is not yet answered. You can click *edit* on the question to add more information to it."},
+     { Name: "[A]Answers just to say Thanks!", Description: "This is a question-and-answer site, not a forum – so please don\'t add \"thanks\" as answers. Invest some time in the site and you will gain sufficient [privileges](http://$SITEURL$/privileges) to upvote answers you like, which is the $SITENAME$ way of saying thank you." },
+     { Name: "[A]Nothing but a URL (and isn\'t spam)", Description: "Whilst this may theoretically answer the question, [it would be preferable](http://meta.stackoverflow.com/q/8259) to include the essential parts of the answer here, and provide the link for reference. Otherwise, your answer becomes useless in case the link dies." },
+     { Name: "[A]Comments as an answer (new users)", Description: "This is a question-and-answer site, not a forum: please don\'t add comments as answers. Invest some time in the site and you will gain sufficient [privileges](http://$SITEURL$/privileges) to upvote answers you like, or to add actual comments when seeking clarification of any issues."},
+     { Name: "[A]Comments as an answer (experienced users)", Description: "This is a question-and-answer site, not a forum: please don\'t add comments as answers. Use actual comments when seeking clarification of any issues."},
+     { Name: "[A]Answer that is a question", Description: "This is a question-and-answer site, not a forum. Please use the *Post answer* button only if you have a solution to the problem. If you have another question, please ask it by clicking the [Ask Question](http://$SITEURL$/questions/ask) button. Include a link to this question if it helps provide context."},
+     { Name: "[A]Requests to OP for further information", Description: "This is really a comment, not an answer. With a bit more rep, [you will be able to post comments](http://$SITEURL$/privileges/comment). For the moment I\'ve added the comment for you, and I\'m flagging this post for deletion." },
+     { Name: "[A]Another user adding a \'Me too!\'", Description: "This is a question-and-answer site, not a forum. Please use the *Post answer* button only if you have a solution to the problem. If you have a NEW question, please ask it by clicking the [Ask Question](http://$SITEURL$/questions/ask) button. If you have sufficient reputation, [you may upvote](http://$SITEURL$/privileges/vote-up) the question. Alternatively, \"star\" it as a favorite and you will be notified of any new answers." },
+     { Name: "[A]Low quality answer", Description: "This post does not contain enough information to be considered a high quality answer. Please [read our discussion on what makes an answer high quality](http://meta.softwarerecs.stackexchange.com/q/356/$MYUSERID$) to see if you can incorporate some of these improvements into your answer, otherwise it will be removed.", Site: "softwarerecs.stackexchange.com" }
     ];
 
     var weekday_name = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var minute = 60, hour = 3600, day = 86400, sixdays = 518400, week = 604800, month = 2592000, year = 31536000;
 
     //Wrap local storage access so that we avoid collisions with other scripts
-    function GetStorage(key) { return localStorage[prefix + key]; }
+//    function GetStorage(key) { return localStorage[prefix + key]; }
+    function GetStorage(key) { var st = localStorage[prefix + key]; if (st==undefined) return ''; return st; }
     function SetStorage(key, val) { localStorage[prefix + key] = val; }
     function RemoveStorage(key) { localStorage.removeItem(prefix + key); }
     function ClearStorage(startsWith) {
@@ -240,6 +252,15 @@ with_jquery(function ($) {
         return d + (r > 0 ? "." + r : "") + "k"
       }
       else return Math.round(r / 1E3) + "k"
+    }
+
+    // Get the Id of the logged-in user
+    function getLoggedInUserId() {
+      if ( document.getElementsByClassName('profile-me')[0].href.match(/\/users\/(\d+)\/.*/i) ) {
+        return RegExp.$1;
+      } else {
+        return '';
+      }
     }
 
     //Get userId for post
@@ -309,7 +330,9 @@ with_jquery(function ($) {
       for(var i = 0; i < GetStorage("commentcount"); i++) {
         var name = GetStorage('name-' + i);
         var desc = GetStorage('desc-' + i);
-        txt += '###' + name + '\n' + htmlToMarkDown(desc) + '\n\n'; //the leading ### makes prettier if pasting to markdown, and differentiates names from descriptions
+        var site = GetStorage('site-' + i);
+        if (site==undefined) site = '';
+        txt += '###' + name + '\n' + '§§§' + site + '\n' + htmlToMarkDown(desc) + '\n\n'; //the leading ### makes prettier if pasting to markdown, and differentiates names from descriptions
       }
 
       div.find('textarea').width('100%').height('95%').val(txt);
@@ -330,15 +353,18 @@ with_jquery(function ($) {
     //Import complete text into comments
     function DoImport(text) {
       //clear out any existing stuff
-      ClearStorage("name-"); ClearStorage("desc-");
+      ClearStorage("name-"); ClearStorage("desc-"); ClearStorage("site-");
       var arr = text.split('\n');
-      var nameIndex = 0, descIndex = 0;
+      var nameIndex = 0, descIndex = 0, siteIndex = 0;
       for(var i = 0; i < arr.length; i++) {
         var line = $.trim(arr[i]);
         if(line.indexOf('#') == 0) {
-          var name = line.replace(/^#+/g, '');
-          SetStorage('name-' + nameIndex, name);
+          SetStorage('name-' + nameIndex, line.substr(3));
           nameIndex++;
+        }
+        else if(line.indexOf('§') == 0) {
+          SetStorage('site-' + siteIndex, line.substr(3));
+          siteIndex++;
         }
         else if(line.length > 0) {
           var desc = markDownToHtml(line);
@@ -361,13 +387,13 @@ with_jquery(function ($) {
     }
 
     function UnTag(text) {
-      return text.replace(/\$SITENAME\$/g, sitename).replace(/\$SITEURL\$/g, siteurl)
+      return text.replace(/\$SITENAME\$/g, sitename).replace(/\$SITEURL\$/g, siteurl).replace(/\$MYUSERID\$/g, myuserid);
     }
 
     function Tag(html) {
       //put tags back in
-      var regname = new RegExp(sitename, "g"), regurl = new RegExp('http://' + siteurl, "g");
-      return html.replace(regname, '$SITENAME$').replace(regurl, 'http://$SITEURL$');
+      var regname = new RegExp(sitename, "g"), regurl = new RegExp('http://' + siteurl, "g"), reguid = new RegExp('/' + myuserid + '[)]', "g");
+      return html.replace(regname, '$SITENAME$').replace(regurl, 'http://$SITEURL$').replace(reguid, '/$MYUSERID$)'); // myuserid/$MYUSERID$ ???
     }
 
     //Replace contents of element with a textarea (containing markdown of contents), and save/cancel buttons
@@ -411,10 +437,12 @@ with_jquery(function ($) {
 
     //Empty all custom comments from storage and rewrite to ui
     function ResetComments() {
-      ClearStorage("name-"); ClearStorage("desc-");
+      ClearStorage("name-"); ClearStorage("desc-"); ClearStorage("site-");
       $.each(defaultcomments, function (index, value) {
         SetStorage('name-' + index, value["Name"]);
         SetStorage('desc-' + index, value["Description"]);
+        if ( value["Site"] == undefined ) SetStorage('site-' + index, '');
+        else SetStorage('site-' + index, value["Site"]);
       });
       SetStorage("commentcount", defaultcomments.length);
     }
@@ -427,7 +455,9 @@ with_jquery(function ($) {
       for(var i = 0; i < GetStorage("commentcount"); i++) {
         var commenttype = GetCommentType(GetStorage('name-' + i));
         if(commenttype == "any" || (commenttype == popup.posttype)) {
-          var desc = GetStorage('desc-' + i).replace(/\$SITENAME\$/g, sitename).replace(/\$SITEURL\$/g, siteurl).replace(/\$/g, "$$$");
+          var tsite = GetStorage('site-' + i);
+          if ( !(tsite == undefined || tsite == '' || tsite == siteurl) ) continue;
+          var desc = GetStorage('desc-' + i).replace(/\$SITENAME\$/g, sitename).replace(/\$SITEURL\$/g, siteurl).replace(/\$MYUSERID\$/g, myuserid).replace(/\$/g, "$$$");
           var opt = optionTemplate.replace(/\$ID\$/g, i)
                           .replace("$NAME$", GetStorage('name-' + i).replace(/\$/g, "$$$"))
                           .replace("$DESCRIPTION$", (showGreeting ? greeting : "") + desc);
@@ -537,6 +567,8 @@ with_jquery(function ($) {
         $.each(data, function (index, value) {
           SetStorage('name-' + index, value.name);
           SetStorage('desc-' + index, markDownToHtml(value.description));
+          if ( value.Site == undefined ) SetStorage('site-' + index, '');
+          else SetStorage('site-' + index, value.Site);
         });
         done();
       }, error);
@@ -681,7 +713,7 @@ with_jquery(function ($) {
         //also wrap it so that it only gets called the *FIRST* time we open this dialog on any given page (not much of an optimisation).
         if(!window.VersionChecked) { CheckForNewVersion(popup); window.VersionChecked = true; }
       }));
-
+      //$('#' + divid).find('.comment-help-link').parent().append(newspan);
       setTimeout(function() {
         $('#' + divid).find('.comment-help-link').parent().append(newspan);
       }, 15);
