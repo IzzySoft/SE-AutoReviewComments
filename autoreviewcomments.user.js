@@ -192,8 +192,8 @@ with_jquery(function ($) {
     var minute = 60, hour = 3600, day = 86400, sixdays = 518400, week = 604800, month = 2592000, year = 31536000;
 
     //Wrap local storage access so that we avoid collisions with other scripts
-//    function GetStorage(key) { return localStorage[prefix + key]; }
-    function GetStorage(key) { var st = localStorage[prefix + key]; if (st==undefined) return ''; return st; }
+    // function GetStorage(key) { return localStorage[prefix + key]; } // caused the script to break for me at some points, throwing "GetStorage is undefined". So:
+    function GetStorage(key) { var st = localStorage[prefix + key]; if (st==undefined) return ''; return st; } // *!* Needs check for possible side-effects where "undefined" is wanted
     function SetStorage(key, val) { localStorage[prefix + key] = val; }
     function RemoveStorage(key) { localStorage.removeItem(prefix + key); }
     function ClearStorage(startsWith) {
@@ -359,11 +359,11 @@ with_jquery(function ($) {
       for(var i = 0; i < arr.length; i++) {
         var line = $.trim(arr[i]);
         if(line.indexOf('#') == 0) {
-          SetStorage('name-' + nameIndex, line.substr(3));
+          SetStorage('name-' + nameIndex, line.substr(3)); // maybe better keep line.replace(/^#+/g, '') ?
           nameIndex++;
         }
         else if(line.indexOf('§') == 0) {
-          SetStorage('site-' + siteIndex, line.substr(3));
+          SetStorage('site-' + siteIndex, line.substr(3)); // maybe better line.replace(/^§+/g, '') ?
           siteIndex++;
         }
         else if(line.length > 0) {
@@ -713,7 +713,6 @@ with_jquery(function ($) {
         //also wrap it so that it only gets called the *FIRST* time we open this dialog on any given page (not much of an optimisation).
         if(!window.VersionChecked) { CheckForNewVersion(popup); window.VersionChecked = true; }
       }));
-      //$('#' + divid).find('.comment-help-link').parent().append(newspan);
       setTimeout(function() {
         $('#' + divid).find('.comment-help-link').parent().append(newspan);
       }, 15);
