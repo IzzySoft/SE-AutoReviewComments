@@ -53,7 +53,7 @@ with_jquery(function ($) {
   StackExchange.ready(function () {
     //**selfupdatingscript starts here (see https://gist.github.com/raw/874058/selfupdatingscript.user.js)
     var VERSION = '1.3.1izzy2';  //<<<<<<<<<<<<*********************** DON'T FORGET TO UPDATE THIS!!!! *************************
-    var URL = "https://github.com/IzzySoft/SE-AutoReviewComments/per_site_comments/master/autoreviewcomments.user.js";
+    var URL = "https://github.com/IzzySoft/SE-AutoReviewComments/raw/per_site_comments/autoreviewcomments.user.js";
 
     if(window["selfUpdaterCallback:" + URL]) {
       window["selfUpdaterCallback:" + URL](VERSION);
@@ -77,8 +77,7 @@ with_jquery(function ($) {
     var OP = 'OP';
     var prefix = "AutoReviewComments-"; //prefix to avoid clashes in localstorage
 
-    sitename.replace(/ Stack Exchange/,'');
-    var greeting = 'Welcome to  ' + sitename.replace(/ Stack Exchange/,'') + '! ';
+    var greeting = 'Welcome to  ' + sitename.replace(/ ?Stack Exchange/,'') + '! ';
     var showGreeting = false;
 
     var markupTemplate = '                                                                            \
@@ -563,7 +562,7 @@ with_jquery(function ($) {
     function LoadFromRemote(url, done, error) {
       GetRemote(url, function (data) {
         SetStorage("commentcount", data.length);
-        ClearStorage("name-"); ClearStorage("desc-");
+        ClearStorage("name-"); ClearStorage("desc-"); ClearStorage("site-");
         $.each(data, function (index, value) {
           SetStorage('name-' + index, value.name);
           SetStorage('desc-' + index, markDownToHtml(value.description));
